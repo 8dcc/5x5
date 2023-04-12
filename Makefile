@@ -1,7 +1,7 @@
 
 CC=gcc
-CFLAGS=-Wall -Wextra
-LDFLAGS=
+CFLAGS=-Wall -Wextra -std=c11
+LDFLAGS=-lncurses
 
 OBJS=obj/main.c.o
 BIN=5x5.out
