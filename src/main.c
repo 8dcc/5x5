@@ -401,11 +401,11 @@ int main(int argc, char** argv) {
             case 'c':
                 print_message(&ctx, "Generating cheat state...");
                 char arr[] = "#####"
-                             "## ##"
-                             "#   #"
-                             "## ##"
+                             "##.##"
+                             "#...#"
+                             "##.##"
                              "#####";
-                memcpy(ctx.grid, arr, sizeof(arr));
+                memcpy(ctx.grid, arr, sizeof(arr) - 1);
                 break;
 #endif
             case KEY_CTRLC:
