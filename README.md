@@ -1,22 +1,21 @@
-## Title
-**Short description.**
+## 5x5
+**Simple CLI 5x5 game made in C.**
 
 ### Description
-Long description.
+This simple project was inspired by the `5x5` emacs command.
 
 ### Building
 
-<!-- TODO: Change project-name -->
 ```console
-$ git clone https://github.com/8dcc/project-name
-$ cd project-name
+$ git clone https://github.com/8dcc/5x5
+$ cd 5x5
 $ make
 ...
 ```
 
 ### Usage
 ```console
-$ ./project-name.out --help
+$ ./5x5.out --help
 ...
 
 ```
