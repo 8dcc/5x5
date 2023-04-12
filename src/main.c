@@ -93,6 +93,9 @@ static inline bool parse_args(int argc, char** argv, ctx_t* ctx) {
                  "        hjkl - Move in the grid (vim-like)\n"
                  "     <space> - Toggle selected cell (and adjacent)\n"
                  "           r - Generate random grid\n"
+#ifdef CHEAT
+                 "           c - Generate a cheat grid\n"
+#endif
                  "           q - Quit the game");
             return false;
         } else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
@@ -394,6 +397,17 @@ int main(int argc, char** argv) {
                 /* Generate again but in random positions */
                 init_grid(&ctx, true);
                 break;
+#ifdef CHEAT
+            case 'c':
+                print_message(&ctx, "Generating cheat state...");
+                char arr[] = "#####"
+                             "## ##"
+                             "#   #"
+                             "## ##"
+                             "#####";
+                memcpy(ctx.grid, arr, sizeof(arr));
+                break;
+#endif
             case KEY_CTRLC:
                 c = 'q';
                 break;

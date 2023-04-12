@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+/**
+ * @def CHEAT
+ * @brief Compile with cheater features.
+ * @details If the program is compiled with this macro defined, it will add the
+ * "Generate cheat grid" feature, which generates a very easy game for testing.
+ */
+#define CHEAT
+
 #define DEFAULT_W 5 /**< @brief Default width */
 #define DEFAULT_H 5 /**< @brief Default height */
 #define DEFAULT_S 3 /**< @brief Default scale */
