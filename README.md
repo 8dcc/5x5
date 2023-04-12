@@ -16,7 +16,24 @@ $ make
 ### Usage
 ```console
 $ ./5x5.out --help
-...
+Usage:
+    ./5x5.out                   - Launch with default resolution and scale
+    ./5x5.out --help            - Show this help
+    ./5x5.out -h                - Same as --help
+    ./5x5.out --keys            - Show the controls
+    ./5x5.out -k                - Same as --keys
+    ./5x5.out --resolution WxH  - Launch with specified resolution (width, height)
+    ./5x5.out -r WxH            - Same as --resolution
+    ./5x5.out --scale N         - Launch with specified scale
+    ./5x5.out -s N              - Same as --scale
 
+$ ./5x5.out --keys
+Controls:
+    <arrows> - Move in the grid
+        hjkl - Move in the grid (vim-like)
+     <space> - Toggle selected cell (and adjacent)
+           r - Generate random grid
+           c - Generate a cheat grid
+           q - Quit the game
 ```
 
