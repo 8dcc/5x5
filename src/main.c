@@ -129,13 +129,29 @@ static inline bool parse_args(int argc, char** argv, ctx_t* ctx) {
  * all OFF otherwise.
  */
 static inline void init_grid(ctx_t* ctx, bool random) {
-    if (random) {
-        /** @todo Random grid */
-    } else {
-        for (int y = 0; y < ctx->h; y++)
-            for (int x = 0; x < ctx->w; x++)
+    for (int y = 0; y < ctx->h; y++) {
+        for (int x = 0; x < ctx->w; x++) {
+            /* There is 50% chance a tile is turned on if random == true */
+            if (random && rand() % 2)
+                ctx->grid[y * ctx->w + x] = ON_CH;
+            else
                 ctx->grid[y * ctx->w + x] = OFF_CH;
+        }
     }
+}
+
+/**
+ * @brief Prints a message under the game grid.
+ * @details Doesn't change the cursor position.
+ * @param[in] s String to display.
+ */
+static inline void print_message(ctx_t* ctx, const char* s) {
+    int oy, ox;
+    getyx(stdscr, oy, ox);
+
+    mvprintw((ctx->h * ctx->sc) + 3, 1, s);
+
+    move(oy, ox);
 }
 
 /**
@@ -198,7 +214,7 @@ static inline void draw_border(const ctx_t* ctx) {
  *
  * @param[in] ctx Game context structure for the grid.
  */
-static void redraw_grid(ctx_t* ctx) {
+static void redraw_grid(const ctx_t* ctx) {
     const int border_sz = 1;
 
     draw_border(ctx);
@@ -278,6 +294,21 @@ static inline void toggle_adjacent(ctx_t* ctx) {
 }
 
 /**
+ * @brief Checks if the user won the game.
+ * @param[in] ctx Context pointer used to check if there is an OFF tile.
+ * @return True if all tiles are ON.
+ */
+static inline bool check_win(const ctx_t* ctx) {
+    for (int y = 0; y < ctx->h; y++)
+        for (int x = 0; x < ctx->w; x++)
+            if (ctx->grid[y * ctx->w + x] == OFF_CH)
+                return false;
+
+    /* We won! */
+    return true;
+}
+
+/**
  * @brief Entry point of the program
  * @param argc Number of arguments
  * @param argv Vector of string arguments
@@ -328,7 +359,7 @@ int main(int argc, char** argv) {
         c = tolower(getch());
 
         /* Clear the output line */
-        clear_line(ctx.h + 3);
+        clear_line((ctx.h * ctx.sc) + 3);
 
         /* Parse input. 'q' quits and there is vim-like navigation */
         switch (c) {
@@ -354,9 +385,14 @@ int main(int argc, char** argv) {
                 break;
             case ' ':
                 toggle_adjacent(&ctx);
+
+                if (check_win(&ctx))
+                    print_message(&ctx, "You won!");
+
                 break;
             case 'r':
-                /** @todo Random ON/OFF grid */
+                /* Generate again but in random positions */
+                init_grid(&ctx, true);
                 break;
             case KEY_CTRLC:
                 c = 'q';
