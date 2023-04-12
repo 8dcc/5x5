@@ -24,11 +24,13 @@
 #define KEY_CTRLC 3
 
 /**
- * @name Characters for the tiles
- * @{ */
-#define ON_CH  '#' /**< @brief On tile */
-#define OFF_CH '.' /**< @brief Off tile */
-/** @} */
+ * @enum game_chars
+ * @brief Characters for the tiles
+ */
+enum game_chars {
+    ON_CH  = '#', /**< @brief On tile */
+    OFF_CH = '.', /**< @brief Off tile */
+};
 
 /**
  * @struct point_t
