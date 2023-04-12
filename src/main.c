@@ -217,11 +217,15 @@ static void redraw_grid(ctx_t* ctx) {
         }
     }
 
-    // FIXME
-    /* Update the cursor to the real positions (center of scaled tiles +
-     * margin) */
-    const int real_y = ctx->cursor.y * (ctx->sc - ctx->sc / 2) + border_sz;
-    const int real_x = ctx->cursor.x * (ctx->sc - ctx->sc / 2) + border_sz;
+    /* Update the cursor to the real position:
+     *   - Get scaled position of tile.
+     *   - Go to center of the tile.
+     *   - Add border size to get real position.
+     *   - Subtract 1 to get the zero-starting index. */
+    const int real_y =
+      (ctx->cursor.y * ctx->sc) + (ctx->sc - ctx->sc / 2) + border_sz - 1;
+    const int real_x =
+      (ctx->cursor.x * ctx->sc) + (ctx->sc - ctx->sc / 2) + border_sz - 1;
     move(real_y, real_x);
 }
 
