@@ -177,8 +177,9 @@ static inline void clear_line(int y) {
  * @param[in] ctx Game context structure for the width and height.
  */
 static inline void draw_border(const ctx_t* ctx) {
-    const int real_w = ctx->w * ctx->sc;
-    const int real_h = ctx->h * ctx->sc;
+    const int hspacing = (ctx->sc >= 3) ? 1 : 0;
+    const int real_w   = ctx->w * (ctx->sc + hspacing) + hspacing;
+    const int real_h   = ctx->h * ctx->sc;
 
     /** @todo Add vertical spaces after columns here and in redraw_grid() */
 
@@ -207,29 +208,25 @@ static inline void draw_border(const ctx_t* ctx) {
  * (unscaled) grid. This function will use it to move to the real post-scale
  * cursor position on the terminal.
  *
- * First of all, each for loop will initialize (clear) the term_* variables to
- * the real positions of the first row/col.
- *
- * Each for loop iteration, it will:
- *  - Increase the grid position (go to next tile)
- *  - Add the scale to the term_x and term_y variables, getting the real
- *    position of that next cell in the terminal.
- *
  * @param[in] ctx Game context structure for the grid.
  */
 static void redraw_grid(const ctx_t* ctx) {
-    const int border_sz = 1;
+    const int hspacing = (ctx->sc >= 3) ? 1 : 0;
+    const int yborder  = 1;
+    const int xborder  = 1 + hspacing;
+    const int ysc      = ctx->sc;
+    const int xsc      = ctx->sc + hspacing;
 
     draw_border(ctx);
 
-    /* See function details for explanation about the for loops */
+    /* Iterate tiles from grid */
     for (int y = 0; y < ctx->h; y++) {
         for (int x = 0; x < ctx->w; x++) {
             const char c = ctx->grid[y * ctx->w + x];
 
             /* Draw the actual scaled tile in the real positions */
-            const int term_y = y * ctx->sc + border_sz;
-            const int term_x = x * ctx->sc + border_sz;
+            const int term_y = y * ysc + yborder;
+            const int term_x = x * xsc + xborder;
             for (int ty = term_y; ty < term_y + ctx->sc; ty++)
                 for (int tx = term_x; tx < term_x + ctx->sc; tx++)
                     mvaddch(ty, tx, c);
@@ -237,14 +234,14 @@ static void redraw_grid(const ctx_t* ctx) {
     }
 
     /* Update the cursor to the real position:
+     *   - In the case of the X coor, add 1 to scale for extra horizontal
+     *     spacing (plus 1 to horizontal border).
      *   - Get scaled position of tile.
      *   - Go to center of the tile.
      *   - Add border size to get real position.
      *   - Subtract 1 to get the zero-starting index. */
-    const int real_y =
-      (ctx->cursor.y * ctx->sc) + (ctx->sc - ctx->sc / 2) + border_sz - 1;
-    const int real_x =
-      (ctx->cursor.x * ctx->sc) + (ctx->sc - ctx->sc / 2) + border_sz - 1;
+    const int real_y = (ctx->cursor.y * ysc) + (ysc - ysc / 2) + yborder - 1;
+    const int real_x = (ctx->cursor.x * xsc) + (xsc - xsc / 2) + xborder - 1;
     move(real_y, real_x);
 }
 
