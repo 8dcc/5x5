@@ -24,8 +24,8 @@ Usage:
     ./5x5.out -k                - Same as --keys
     ./5x5.out --resolution WxH  - Launch with specified resolution (width, height)
     ./5x5.out -r WxH            - Same as --resolution
-    ./5x5.out --scale N         - Launch with specified scale
-    ./5x5.out -s N              - Same as --scale
+    ./5x5.out --scale VxH       - Launch with specified scale (vertical, horizontal)
+    ./5x5.out -s VxH            - Same as --scale
 
 $ ./5x5.out --keys
 Controls:
