@@ -18,14 +18,16 @@
 #include "main.h" /* Structs and defines */
 
 /**
- * @brief Parses a resolution string with format `WIDTHxHEIGHT` using atoi.
- * @param[out] w Pointer where to save the resolution's width
- * @param[out] h Pointer where to save the resolution's height
- * @param[inout] src String containing the resolution in `WIDTHxHEIGHT` format
+ * @brief Parses a pair string with format `AxB` using atoi.
+ * @param[out] a Pointer where to save the first value of the pair (usually
+ * width)
+ * @param[out] b Pointer where to save the second value of the pair (usually
+ * height)
+ * @param[inout] src String containing the pair in `AxB` format.
  */
-static inline void parse_resolution(uint16_t* w, uint16_t* h, char* src) {
-    *w = 0;
-    *h = 0;
+static inline void parse_pair(uint16_t* a, uint16_t* b, char* src) {
+    *a = 0;
+    *b = 0;
 
     char* start = src;
     while (*src != 'x' && *src != '\0')
@@ -38,8 +40,8 @@ static inline void parse_resolution(uint16_t* w, uint16_t* h, char* src) {
     /* Cut string at 'x', make it point to start of 2nd digit */
     *src++ = '\0';
 
-    *w = atoi(start);
-    *h = atoi(src);
+    *a = atoi(start);
+    *b = atoi(src);
 }
 
 /**
@@ -61,7 +63,7 @@ static inline bool parse_args(int argc, char** argv, ctx_t* ctx) {
             }
 
             i++;
-            parse_resolution(&ctx->w, &ctx->h, argv[i]);
+            parse_pair(&ctx->w, &ctx->h, argv[i]);
             if (ctx->w < MIN_W || ctx->h < MIN_H) {
                 fprintf(stderr,
                         "Invalid resolution format for \"%s\".\n"
@@ -78,9 +80,7 @@ static inline bool parse_args(int argc, char** argv, ctx_t* ctx) {
             }
 
             i++;
-            /** @todo Read both scales */
-            ctx->ysc = atoi(argv[i]) - 1;
-            ctx->xsc = atoi(argv[i]);
+            parse_pair(&ctx->ysc, &ctx->xsc, argv[i]);
             if (ctx->ysc < 1 || ctx->xsc < 1) {
                 fprintf(stderr,
                         "Invalid scale format for \"%s\".\n"
@@ -117,8 +117,9 @@ static inline bool parse_args(int argc, char** argv, ctx_t* ctx) {
                "    %s --resolution WxH  - Launch with specified resolution "
                "(width, height)\n"
                "    %s -r WxH            - Same as --resolution\n"
-               "    %s --scale N         - Launch with specified scale\n"
-               "    %s -s N              - Same as --scale\n",
+               "    %s --scale VxH       - Launch with specified scale "
+               "(vertical, horizontal)\n"
+               "    %s -s VxH            - Same as --scale\n",
                argv[0], argv[0], argv[0], argv[0], argv[0], argv[0], argv[0],
                argv[0], argv[0]);
         return false;
