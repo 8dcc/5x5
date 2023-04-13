@@ -78,8 +78,10 @@ static inline bool parse_args(int argc, char** argv, ctx_t* ctx) {
             }
 
             i++;
-            ctx->sc = atoi(argv[i]);
-            if (ctx->sc < 1) {
+            /** @todo Read both scales */
+            ctx->ysc = atoi(argv[i]) - 1;
+            ctx->xsc = atoi(argv[i]);
+            if (ctx->ysc < 1 || ctx->xsc < 1) {
                 fprintf(stderr,
                         "Invalid scale format for \"%s\".\n"
                         "Minimum scale: 1\n",
@@ -152,7 +154,7 @@ static inline void print_message(ctx_t* ctx, const char* s) {
     int oy, ox;
     getyx(stdscr, oy, ox);
 
-    mvprintw((ctx->h * ctx->sc) + 3, 1, s);
+    mvprintw((ctx->h * ctx->ysc) + 3, 1, s);
 
     move(oy, ox);
 }
@@ -177,11 +179,9 @@ static inline void clear_line(int y) {
  * @param[in] ctx Game context structure for the width and height.
  */
 static inline void draw_border(const ctx_t* ctx) {
-    const int hspacing = (ctx->sc >= 3) ? 1 : 0;
-    const int real_w   = ctx->w * (ctx->sc + hspacing) + hspacing;
-    const int real_h   = ctx->h * ctx->sc;
-
-    /** @todo Add vertical spaces after columns here and in redraw_grid() */
+    const int xspacing = (ctx->xsc >= 3) ? 1 : 0;
+    const int real_w   = ctx->w * (ctx->xsc + xspacing) + xspacing;
+    const int real_h   = ctx->h * ctx->ysc;
 
     /* First line */
     mvaddch(0, 0, '+');
@@ -211,11 +211,11 @@ static inline void draw_border(const ctx_t* ctx) {
  * @param[in] ctx Game context structure for the grid.
  */
 static void redraw_grid(const ctx_t* ctx) {
-    const int hspacing = (ctx->sc >= 3) ? 1 : 0;
+    const int xspacing = (ctx->xsc >= 3) ? 1 : 0;
     const int yborder  = 1;
-    const int xborder  = 1 + hspacing;
-    const int ysc      = ctx->sc;
-    const int xsc      = ctx->sc + hspacing;
+    const int xborder  = 1 + xspacing;
+    const int ysc      = ctx->ysc;
+    const int xsc      = ctx->xsc + xspacing;
 
     draw_border(ctx);
 
@@ -224,11 +224,12 @@ static void redraw_grid(const ctx_t* ctx) {
         for (int x = 0; x < ctx->w; x++) {
             const char c = ctx->grid[y * ctx->w + x];
 
-            /* Draw the actual scaled tile in the real positions */
+            /* Draw the actual scaled tile in the real positions. Add real scale
+             * without spacing in the loops so we don't fill the spacing */
             const int term_y = y * ysc + yborder;
             const int term_x = x * xsc + xborder;
-            for (int ty = term_y; ty < term_y + ctx->sc; ty++)
-                for (int tx = term_x; tx < term_x + ctx->sc; tx++)
+            for (int ty = term_y; ty < term_y + ctx->ysc; ty++)
+                for (int tx = term_x; tx < term_x + ctx->xsc; tx++)
                     mvaddch(ty, tx, c);
         }
     }
@@ -237,11 +238,13 @@ static void redraw_grid(const ctx_t* ctx) {
      *   - In the case of the X coor, add 1 to scale for extra horizontal
      *     spacing (plus 1 to horizontal border).
      *   - Get scaled position of tile.
-     *   - Go to center of the tile.
+     *   - Go to center of the tile (Using scale without spacing).
      *   - Add border size to get real position.
      *   - Subtract 1 to get the zero-starting index. */
-    const int real_y = (ctx->cursor.y * ysc) + (ysc - ysc / 2) + yborder - 1;
-    const int real_x = (ctx->cursor.x * xsc) + (xsc - xsc / 2) + xborder - 1;
+    const int real_y =
+      (ctx->cursor.y * ysc) + (ctx->ysc - ctx->ysc / 2) + yborder - 1;
+    const int real_x =
+      (ctx->cursor.x * xsc) + (ctx->xsc - ctx->xsc / 2) + xborder - 1;
     move(real_y, real_x);
 }
 
@@ -317,9 +320,10 @@ static inline bool check_win(const ctx_t* ctx) {
 int main(int argc, char** argv) {
     /* Main context struct */
     ctx_t ctx = (ctx_t){
-        .w      = DEFAULT_W,
         .h      = DEFAULT_H,
-        .sc     = DEFAULT_S,
+        .w      = DEFAULT_W,
+        .ysc    = DEFAULT_YSC,
+        .xsc    = DEFAULT_XSC,
         .cursor = (point_t){ 0, 0 },
         .grid   = NULL,
     };
@@ -359,7 +363,7 @@ int main(int argc, char** argv) {
         c = tolower(getch());
 
         /* Clear the output line */
-        clear_line((ctx.h * ctx.sc) + 3);
+        clear_line((ctx.h * ctx.ysc) + 3);
 
         /* Parse input. 'q' quits and there is vim-like navigation */
         switch (c) {

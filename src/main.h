@@ -11,11 +11,12 @@
  */
 #define CHEAT
 
-#define DEFAULT_W 5 /**< @brief Default width */
-#define DEFAULT_H 5 /**< @brief Default height */
-#define DEFAULT_S 3 /**< @brief Default scale */
-#define MIN_W     5 /**< @brief Minimum width */
-#define MIN_H     5 /**< @brief Minimum height */
+#define DEFAULT_H   5 /**< @brief Default height */
+#define DEFAULT_W   5 /**< @brief Default width */
+#define DEFAULT_YSC 3 /**< @brief Default vertical scale */
+#define DEFAULT_XSC 4 /**< @brief Default horizontal scale */
+#define MIN_W       5 /**< @brief Minimum width */
+#define MIN_H       5 /**< @brief Minimum height */
 
 /**
  * @def KEY_CTRLC
@@ -48,9 +49,10 @@ typedef struct {
  * @brief Context used for the game.
  */
 typedef struct {
-    uint16_t w;     /**< @brief Grid width */
     uint16_t h;     /**< @brief Grid height */
-    uint16_t sc;    /**< @brief Grid scale for rendering */
+    uint16_t w;     /**< @brief Grid width */
+    uint16_t ysc;   /**< @brief Vertical grid scale for rendering */
+    uint16_t xsc;   /**< @brief Horizontal scale for rendering */
     point_t cursor; /**< @brief User position inside the grid */
 
     /**
